@@ -5,6 +5,7 @@ from urlparse import urlparse
 from os.path import splitext,basename,isdir
 from os import makedirs
 import re
+import urllib2
 
 
 def crawl(topic_id,folder_name,page = 0):
@@ -48,6 +49,7 @@ def crawl(topic_id,folder_name,page = 0):
 			if r.status_code == 200:
 				try:
 					filename = re.findall("filename=(\S+)", r.headers['Content-Disposition'])[0][1:-1]
+					filename = urllib2.unquote(filename).decode('utf-8')
 				except:
 					filename = splitext(basename(urlparse(i).path))
 					filename = filename[0] + filename[1]
