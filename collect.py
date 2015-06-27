@@ -2,7 +2,7 @@
 from bs4 import BeautifulSoup
 import requests
 from urlparse import urlparse
-from os.path import splitext,basename,isdir
+from os.path import splitext,basename,isdir,isfile
 from os import makedirs
 import re
 import urllib2
@@ -25,6 +25,13 @@ def crawl(topic_id,folder_name,page = 0):
 		#end if no more page
 		if r.status_code != 200:
 			break
+		#check if the page number matchs
+		if (page>1):
+			d = len(str(page))
+			if r.url[-d:] != str(page):
+				print "End of thread"
+				break
+
 		print "crawling page %s" %page,
 		soup = BeautifulSoup(r.text)
 		#retrieve all links in the page
@@ -53,13 +60,15 @@ def crawl(topic_id,folder_name,page = 0):
 				except:
 					filename = splitext(basename(urlparse(i).path))
 					filename = filename[0] + filename[1]
-				with open(path + filename, 'wb') as f:
-					for chunk in r.iter_content(1024):
-						f.write(chunk)
+				# don't grab files already grabbed
+				if not isfile(path+filename):
+					with open(path + filename, 'wb') as f:
+						for chunk in r.iter_content(1024):
+							f.write(chunk)
 		print "images saved: %s" % len(image_links),
 		print "DONE."
 
 #modify this line to collect data
 #    crawl(topic_id,folder_name)
 # this will crawl the topic with the correcponding id, and save all the images into folder 'folder_name', arranged by page number
-crawl(88119,"irene",7)
+crawl(176488,"sana")
